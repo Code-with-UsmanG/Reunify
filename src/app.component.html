@@ -1,0 +1,129 @@
+
+<main class="bg-gray-50 dark:bg-gray-900 min-h-screen text-gray-800 dark:text-gray-200 p-4 sm:p-6 lg:p-8 font-sans">
+  
+  <!-- Loading Overlay -->
+  @if (isLoading()) {
+    <div class="fixed inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center z-50">
+      <div class="w-16 h-16 border-4 border-t-transparent border-blue-500 rounded-full animate-spin"></div>
+      <p class="mt-4 text-white text-lg">{{ statusMessage() }}</p>
+    </div>
+  }
+
+  <div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <h1 class="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
+        Photo Reunify AI
+      </h1>
+      <p class="mt-2 text-lg text-gray-600 dark:text-gray-400">
+        Blend your past and present into a new work of art.
+      </p>
+    </header>
+
+    @if (errorMessage()) {
+      <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md mb-6" role="alert">
+        <p class="font-bold">Error</p>
+        <p>{{ errorMessage() }}</p>
+      </div>
+    }
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Controls Panel -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 space-y-6">
+        <!-- Step 1: Upload Photos -->
+        <div>
+          <h2 class="text-2xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Step 1: Upload Your Photos</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Childhood Photo -->
+            <div class="text-center">
+              <label class="font-semibold mb-2 block">Childhood Photo</label>
+              <div (click)="triggerFileUpload('childhood-photo-input')" class="aspect-square border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                @if (childhoodPhoto()) {
+                  <img [src]="childhoodPhoto()" alt="Childhood photo preview" class="w-full h-full object-cover rounded-lg">
+                } @else {
+                  <div class="text-gray-500 dark:text-gray-400 p-2">
+                    <svg class="w-12 h-12 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3 3m3-3l3 3m-10.5 6a9 9 0 1118 0 9 9 0 01-18 0z" /></svg>
+                    <span class="mt-2 block text-sm">Click to upload</span>
+                  </div>
+                }
+              </div>
+              <input id="childhood-photo-input" type="file" class="hidden" (change)="onPhotoSelected($event, 'childhood')" accept="image/*">
+            </div>
+            <!-- Current Photo -->
+            <div class="text-center">
+              <label class="font-semibold mb-2 block">Current Photo</label>
+              <div (click)="triggerFileUpload('current-photo-input')" class="aspect-square border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                @if (currentPhoto()) {
+                  <img [src]="currentPhoto()" alt="Current photo preview" class="w-full h-full object-cover rounded-lg">
+                } @else {
+                  <div class="text-gray-500 dark:text-gray-400 p-2">
+                    <svg class="w-12 h-12 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l-3 3m3-3l3 3m-10.5 6a9 9 0 1118 0 9 9 0 01-18 0z" /></svg>
+                    <span class="mt-2 block text-sm">Click to upload</span>
+                  </div>
+                }
+              </div>
+              <input id="current-photo-input" type="file" class="hidden" (change)="onPhotoSelected($event, 'current')" accept="image/*">
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Choose Style -->
+        <div>
+          <h2 class="text-2xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Step 2: Choose a Style</h2>
+          <div class="flex flex-wrap gap-3">
+            @for (style of styleOptions(); track style.id) {
+              <button
+                (click)="selectStyle(style.id)"
+                class="px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300"
+                [class]="selectedStyle() === style.id ? 'text-white bg-gradient-to-r ' + style.gradient + ' shadow-lg scale-105' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:scale-105'">
+                {{ style.name }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Step 3: Generate -->
+        <div>
+          <h2 class="text-2xl font-bold mb-4 border-b pb-2 border-gray-200 dark:border-gray-700">Step 3: Create Magic</h2>
+          <button (click)="reunifyPhotos()" [disabled]="!canReunify()" class="w-full py-3 px-4 text-white font-bold rounded-lg transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+            Reunify Photos
+          </button>
+        </div>
+      </div>
+
+      <!-- Result Panel -->
+      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 flex flex-col justify-center items-center space-y-4">
+        <div class="w-full aspect-square bg-gray-100 dark:bg-gray-700/50 rounded-lg flex items-center justify-center">
+          @if (generatedPhoto()) {
+            <img [src]="generatedPhoto()" alt="Generated reunified photo" class="w-full h-full object-contain rounded-lg">
+          } @else {
+            <div class="text-center text-gray-500 dark:text-gray-400 p-4">
+              <svg class="w-16 h-16 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+              <p class="mt-2">Your masterpiece will appear here</p>
+            </div>
+          }
+        </div>
+        
+        @if (generatedPhoto()) {
+          <div class="w-full pt-4">
+            <h3 class="text-xl font-bold mb-2 text-center">Edit Your Image</h3>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <input 
+                type="text" 
+                [value]="editPrompt()"
+                (input)="updateEditPrompt($event)"
+                placeholder="e.g., 'Add a retro filter' or 'Make it a watercolor painting'"
+                class="flex-grow w-full px-4 py-2 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <button 
+                (click)="editImage()" 
+                [disabled]="!canEdit()"
+                class="px-6 py-2 bg-green-500 text-white font-semibold rounded-md hover:bg-green-600 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed">
+                Apply Edit
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</main>

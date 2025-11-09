@@ -1,0 +1,5 @@
+{
+  "name": "Photo Reunify AI",
+  "description": "An application that uses AI to creatively blend your childhood and current photos into a new artistic image. You can also edit the result with text prompts.",
+  "requestFramePermissions": []
+}
